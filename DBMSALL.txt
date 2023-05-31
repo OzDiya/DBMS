@@ -1,0 +1,1296 @@
+/////library membership
+-- create a table
+
+CREATE TABLE student 
+(stud_no INTEGER PRIMARY KEY not NULL,stud_name char(10));
+
+CREATE TABLE membership
+(mem_no INTEGER PRIMARY KEY not NULL,stud_no INTEGER,
+FOREIGN KEY(stud_no)REFERENCES student(stud_no));
+
+CREATE TABLE book
+(book_no INTEGER PRIMARY KEY not NULL,book_name char(10),author char(10));
+
+CREATE TABLE iss_rec
+(iss_no INTEGER PRIMARY KEY not NULL,iss_date date,mem_no INTEGER,
+book_no INTEGER,FOREIGN KEY(book_no)REFERENCES book(book_no),
+FOREIGN KEY(mem_no)REFERENCES membership(mem_no));
+
+-- insert some values in students
+
+INSERT INTO student VALUES (34, 'KATE');
+INSERT INTO student VALUES (55, 'JON');
+INSERT INTO student VALUES (05, 'BEN');
+INSERT INTO student VALUES (27, 'OLA');
+
+-- insert values in membership
+
+INSERT INTO membership VALUES (313, 34);
+INSERT INTO membership VALUES (444, 55);
+INSERT INTO membership VALUES (555, 05);
+INSERT INTO membership VALUES (676,27);
+
+-- insert values in book
+
+INSERT INTO book VALUES (3134, 'MATHS','VK RAMAN');
+INSERT INTO book VALUES (1551, 'SCIENCE','CJDATE');
+INSERT INTO book VALUES (1231, 'ELECTRONICS','RAJURAMAN');
+INSERT INTO book VALUES (2771, 'ECONOMICS','JK DUBEY');
+
+-- insert values in iss_rec
+
+INSERT INTO iss_rec VALUES(945,'2021-11-02',313,3134);
+INSERT INTO iss_rec VALUES(231,'2021-11-03',444,1551);
+INSERT INTO iss_rec VALUES(641,'2021-11-09',555,1231);
+INSERT INTO iss_rec VALUES(989,'2021-11-24',676,2771);
+
+
+c)
+
+SELECT student.stud_name,membership.mem_no FROM student,membership wh
+ere student.stud_no = membership.stud_no;
+
+SELECT student.stud_name,membership.mem_no FROM student inner join
+    -> membership ON student.stud_no=membership.stud_no;
+
+SELECT student.stud_name,membership.mem_no FROM student natural join membership;
+
+
+
+d)
+select iss_no , stud_name , book_name from student , book, membership , iss_rec where student.stud_no=membership.stud_no and membership.mem_no=iss_rec.mem_no and book.book_no = iss_rec.book_no and iss_date='2021-11-02';
+
+select iss_no , stud_name , book_name from student natural join membership natural join iss_rec natural join book where iss_date='2021-11-02';
+
+
+e)
+select stud_name  from student , book, membership , iss_rec where student.stud_no=membership.stud_no and membership.mem_no=iss_rec.mem_no and book.book_no = iss_rec.book_no and author='cjdate';
+
+select  stud_name from student natural join membership natural join iss_rec natural join book where author='CJDATE';
+
+
+f)
+select stud_name , count(iss_no) from student , book, membership , iss_rec where student.stud_no=membership.stud_no and membership.mem_no=iss_rec.mem_no and book.book_no = iss_rec.book_no GROUP BY iss_rec.mem_no;
+
+select  stud_name , count(iss_no) from student natural join membership natural join iss_rec natural join book GROUP BY iss_rec.mem_no
+
+
+g)
+select stud_name , book_name from book,student,membership,iss_rec where student.stud_no = membership.stud_no and membership.mem_no = iss_rec.mem_no and iss_rec.book_no = book.book_no and student.stud_no=5;
+
+select stud_name ,  book_name from student natural join membership natural join iss_rec natural join book where student.stud_no=5;
+
+
+h)
+select book.* from book,iss_rec where  iss_rec.book_no = book.book_no and iss_date='2021-11-02';
+
+select book.* from book natural join iss_rec  where iss_date='2021-11-02' ;
+
+
+i)
+create VIEW v1 as select iss_no , iss_date , stud_name , book_name  from membership, student,iss_rec,book where  student.stud_no = membership.stud_no and membership.mem_no = iss_rec.mem_no and iss_rec.book_no = book.book_no;
+
+create VIEW v11 as select iss_no , iss_date , stud_name , book_name  from  student natural join membership natural join iss_rec natural join book;
+
+j)
+CREATE VIEW v2 as select iss_no , iss_date from iss_rec ORDER B
+Y iss_date asc;
+
+CREATE VIEW v22 as select iss_no , iss_date from iss_rec ORDER BY iss_date desc;
+---------------------------------------------------------------------------------------------------
+
+///roadways travels
+
+//CREATION OF TABLES
+
+create database roadways;
+
+mysql> use roadways;
+Database changed
+mysql> CREATE TABLE Bus (
+    ->     BusNo INT PRIMARY KEY,
+    ->     Source VARCHAR(255),
+    ->     Destination VARCHAR(255),
+    ->     CouchType VARCHAR(255)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+
+mysql> CREATE TABLE Ticket (
+    ->     TicketNo VARCHAR(255) PRIMARY KEY,
+    ->     JourneyDate DATE,
+    ->     Age INT,
+    ->     DepTime VARCHAR(255),
+    ->     Sex VARCHAR(255),
+    ->     Source VARCHAR(255),
+    ->     Destination VARCHAR(255),
+    ->     BusNo INT,
+    ->     FOREIGN KEY (BusNo) REFERENCES Bus(BusNo)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+
+mysql> CREATE TABLE Passenger (
+    ->     TicketNo VARCHAR(255),
+    ->     PNRNo VARCHAR(255),
+    ->     Age INT,
+    ->     Sex VARCHAR(255),
+    ->     ContactNo VARCHAR(255),
+    ->     Name VARCHAR(255),
+    ->     PRIMARY KEY  (PNRNo),
+    ->     FOREIGN KEY (TicketNo) REFERENCES Ticket(TicketNo)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+
+mysql> CREATE TABLE Reservation (
+    ->     PNRNo VARCHAR(255),
+    ->     JourneyDate DATE,
+    ->     ContactNo VARCHAR(255),
+    ->     NoOfSeats INT,
+    ->     BusNo INT,
+    ->     Address VARCHAR(255),
+    ->     FOREIGN KEY (BusNo) REFERENCES Bus(BusNo),
+    ->     FOREIGN KEY (PNRNo) REFERENCES Passenger(PNRNo)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+
+mysql> CREATE TABLE Cancellation (
+    ->     PNRNo VARCHAR(255),
+    ->     JourneyDate DATE,
+    ->     SeatNo VARCHAR(255),
+    ->     ContactNo VARCHAR(255),
+    ->     FOREIGN KEY (PNRNo) REFERENCES Reservation(PNRNo)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+
+//INSERTION INTO TABLES
+
+
+INSERT INTO Bus (BusNo, Source, Destination, CouchType)
+    -> VALUES
+    ->     (1, 'City A', 'City B', 'Regular'),
+    ->     (2, 'City B', 'City C', 'Luxury'),
+    ->     (3, 'City C', 'City D', 'Regular'),
+    ->     (4, 'City D', 'City E', 'Regular'),
+    ->     (5, 'City E', 'City F', 'Luxury');
+Query OK, 5 rows affected (0.01 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+
+mysql> INSERT INTO Ticket (TicketNo, JourneyDate, Age, DepTime, Sex, Source, Destination, BusNo)
+    -> VALUES
+    ->     ('T123', '2023-05-30', 25, '10:00 AM', 'Male', 'City A', 'City B', 1),
+    ->     ('T456', '2023-06-01', 35, '11:30 AM', 'Female', 'City B', 'City C', 2),
+    ->     ('T789', '2023-06-02', 45, '12:45 PM', 'Male', 'City C', 'City D', 3),
+    ->     ('T012', '2023-06-03', 30, '01:30 PM', 'Female', 'City D', 'City E', 4),
+    ->     ('T345', '2023-06-04', 28, '02:15 PM', 'Male', 'City E', 'City F', 5);
+Query OK, 5 rows affected (0.01 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+
+mysql> INSERT INTO Passenger (TicketNo, PNRNo, Age, Sex, ContactNo, Name)
+    -> VALUES
+    ->     ('T123', '101', 25, 'Male', '1234567890', 'John Doe'),
+    ->     ('T456', '102', 35, 'Female', '9876543210', 'Jane Smith'),
+    ->     ('T789', '103', 45, 'Male', '5555555555', 'Mike Johnson'),
+    ->     ('T012', '104', 30, 'Female', '1112223333', 'Emily Brown'),
+    ->     ('T345', '105', 28, 'Male', '4444444444', 'David Wilson');
+Query OK, 5 rows affected (0.01 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+
+mysql> INSERT INTO Reservation (PNRNo, JourneyDate, ContactNo, NoOfSeats, BusNo, Address)
+    -> VALUES
+    ->     ('101', '2023-05-30', '1234567890', 2, 1, '123 Main St'),
+    ->     ('102', '2023-06-01', '9876543210', 3, 2, '456 Elm St'),
+    ->     ('103', '2023-06-02', '5555555555', 1, 3, '789 Oak St'),
+    ->     ('104', '2023-06-03', '1112223333', 4, 4, '321 Pine St'),
+    ->     ('105', '2023-06-04', '4444444444', 2, 5, '654 Cedar St');
+Query OK, 5 rows affected (0.00 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+
+mysql> INSERT INTO Cancellation (PNRNo, JourneyDate, SeatNo, ContactNo)
+    -> VALUES
+    ->     ('101', '2023-05-30', 'A12', '1234567890'),
+    ->     ('102', '2023-06-01', 'B8', '9876543210'),
+    ->     ('103', '2023-06-02', 'C5', '5555555555'),
+    ->     ('104', '2023-06-03', 'D2', '1112223333'),
+    ->     ('105', '2023-06-04', 'E14', '4444444444');
+Query OK, 5 rows affected (0.01 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+
+//QUERIES
+
+
+c)
+SELECT Name FROM passenger WHERE Sex='Male';
+
+d)
+SELECT TicketNo FROM passenger WHERE Name LIKE "j%h";
+// string before % check and after % at end.
+
+e)
+SELECT Name FROM passenger WHERE age BETWEEN 30 AND 45; 
+// 30 and 45 inclusive
+SELECT Name FROM passenger WHERE age >= 30 AND age <= 45;
+
+f)
+SELECT * FROM passenger ORDER BY Name asc;
+
+g)
+SELECT Name , TicketNo from Ticket Natural Join Passenger Natural Join Reservation WHERE noofseats > 1;
+SELECT  count(TicketNo) from Ticket Natural Join Passenger Natural Join Reservation WHERE noofseats > 1;
+
+h)
+SELECT reservation.PNRNo , count(reservation.PNRNo) from bus NATURAL JOIN reservation GROUP BY(Reservation.busno);
+select reservation.PNRNo, count(reservation.pnrno) from bus INNER JOIN  reservation ON reservation.busno = bus.busno GROUP BY(reservation.pnrno);
+select reservation.PNRNo, count(reservation.pnrno) from bus,reservation WHERE reservation.busno = bus.busno GROUP BY(reservation.pnrno);
+
+
+//PROCEDURE
+
+
+mysql> delimiter //
+mysql> create procedure proc()
+    -> begin
+    -> select name,ticketno from passenger;
+    -> end//
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> call proc();
+    -> //
++--------------+----------+
+| name         | ticketno |
++--------------+----------+
+| John Doe     | T123     |
+| Jane Smith   | T456     |
+| Mike Johnson | T789     |
+| Emily Brown  | T012     |
+| David Wilson | T345     |
++--------------+----------+
+5 rows in set (0.01 sec)
+
+Query OK, 0 rows affected (0.02 sec)
+
+-------------------------------------------------------------------------------------
+////employee
+-- Create the "Emp" table
+
+CREATE TABLE Emp (
+    eid INT PRIMARY KEY,
+    ename VARCHAR(255),
+    salary FLOAT
+);
+
+-- Create the "Dept" table
+
+CREATE TABLE Dept (
+    did INT PRIMARY KEY,
+    dname VARCHAR(255),
+    managerid INT,
+    floornum INT
+);
+
+-- Create the "Works" table
+
+CREATE TABLE Works (
+    eid INT,
+    did INT,
+    FOREIGN KEY (eid) REFERENCES Emp(eid) ON UPDATE CASCADE,
+    FOREIGN KEY (did) REFERENCES Dept(did) ON UPDATE CASCADE
+);
+
+
+-- INSERTING INTO TABLE
+
+INSERT INTO Emp (eid, ename, salary)
+VALUES
+    (1, 'John Doe', 5000),
+    (2, 'Jane Smith', 6000),
+    (3, 'Michael Johnson', 5500),
+    (4, 'Emily Brown', 4800),
+    (5, 'David Wilson', 5200),
+    (6, 'Sophia Davis', 5900),
+    (7, 'Daniel Lee', 5100),
+    (8, 'Olivia Taylor', 5600),
+    (9, 'William Martinez', 5300),
+    (10, 'Ava Anderson', 5400);
+
+INSERT INTO Dept (did, dname, managerid, floornum)
+VALUES
+    (101, 'HR', 16, 3),
+    (102, 'Finance', 14, 2),
+    (103, 'Sales', 15, 4),
+    (104, 'IT', 19, 5),
+    (105, 'Marketing', 17, 1),
+    (106, 'Operations', 13, 2),
+    (107, 'Research and Development', 10, 3),
+    (108, 'Customer Support', 12, 4),
+    (109, 'Production', 18, 1),
+    (110, 'Quality Assurance', 11, 5);
+
+INSERT INTO Works (eid, did)
+VALUES
+    (1, 101),
+    (1, 102),
+    (2, 102),
+    (3, 101),
+    (3, 103),
+    (4, 104),
+    (5, 110),
+    (6, 101),
+    (7, 105),
+    (8, 106);
+
+//QUERIES
+
+1)
+select ename from emp natural join works natural join dept where floornum=5 and salary < 6000;
+
+
+2)
+select managerid,floornum from dept group by floornum,managerid having count(*)>2;
+
+//emplyoee working in different dept on same floor
+select ename,floornum from emp natural join works natural join dept group by works.eid,floornum having count(did)>1;
+
+3)
+UPDATE emp set salary=salary*1.1 WHERE eid in ( select eid from works  , dept where dept.did = works.did and dname="HR");
+//with procedure
+create procedure saliinc()
+begin
+ UPDATE emp set salary=salary*1.1 WHERE eid in ( select eid from works  , dept where dept.did = works.did and dname="HR");
+end
+
+
+4)
+SELECT e.ename AS EmployeeName, e.salary AS Salary
+    -> FROM Emp e, Works w1, Dept d1, Works w2, Dept d2
+    -> WHERE e.eid = w1.eid
+    ->   AND w1.did = d1.did
+    ->   AND e.eid = w2.eid
+    ->   AND w2.did = d2.did
+    ->   AND d1.dname = 'HR'
+    ->   AND d2.dname = 'Finance';
+
+select ename,salary 
+		-> from emp natural join works natural join dept 
+		-> where dname ='music' or dname = 'toy' 
+		-> group by(eid)
+		-> having count(dname)>1;
+
+5)
+select ename , salary from emp where salary >1000 and salary < 6000;
+
+6)
+mysql> SELECT *
+    -> FROM Emp
+    -> WHERE eid IN (
+    ->     SELECT DISTINCT w.eid
+    ->     FROM Works w
+    ->     JOIN Dept d ON w.did = d.did
+    ->     WHERE d.did IN (
+    ->         SELECT w2.did
+    ->         FROM Works w2
+    ->         JOIN Emp e ON w2.eid = e.eid
+    ->         WHERE e.ename = 'John Doe'
+    ->     )
+    -> );
+
+mysql> SELECT *
+    -> FROM Emp
+    -> NATURAL JOIN Works w1
+    -> NATURAL JOIN Dept d1
+    -> WHERE d1.did IN (
+    ->     SELECT DISTINCT w2.did
+    ->     FROM Works w2
+    ->     NATURAL JOIN Emp e
+    ->     WHERE e.ename = 'John Doe'
+    -> );
+
+
+7)
+select distinct ename from emp  natural join works natural join dept where salary > 10 and (dname = 'HR' or dname='Finance');
+select ename from emp  natural join works natural join dept where salary > 10 and (dname = 'HR' or dname='Finance');
+
+
+8)
+
+10)
+select * from emp natural join works natural join dept where floornum in(select floornum from emp natural join works natural join dept where (ename = "John Doe"));
+
+
+#EXTRA
+select * from emp where  salary != (select max(salary) from emp ) and salary != (select min(salary) from emp);
+
+11)
+--------------------------------------------------------------------------
+///shop
+//CREATION 
+CREATE TABLE Shops (
+  ShopId INT PRIMARY KEY,
+  name VARCHAR(255),
+  address VARCHAR(255)
+);
+
+CREATE TABLE Items (
+  ItemId INT PRIMARY KEY,
+  name VARCHAR(255),
+  description VARCHAR(255)
+);
+
+CREATE TABLE Sells (
+  ShopId INT,
+  ItemId INT,
+  price DECIMAL(10, 2),
+  FOREIGN KEY (ShopId) REFERENCES Shops(ShopId),
+  FOREIGN KEY (ItemId) REFERENCES Items(ItemId)
+);
+
+CREATE TABLE Customers (
+  CustomerId INT PRIMARY KEY,
+  name VARCHAR(255),
+  address VARCHAR(255)
+);
+
+CREATE TABLE Sales (
+  SaleId INT PRIMARY KEY,
+  CustomerId INT,
+  ItemId INT,
+  ShopId INT,
+  date DATE,
+  FOREIGN KEY (CustomerId) REFERENCES Customers(CustomerId) ON DELETE CASCADE,
+  FOREIGN KEY (ItemId) REFERENCES Items(ItemId) ON DELETE CASCADE,
+  FOREIGN KEY (ShopId) REFERENCES Shops(ShopId) ON DELETE CASCADE
+);
+
+//INSERTION
+
+INSERT INTO Shops (ShopId, name, address)
+VALUES (1, 'Supermart', '123 Main Street'),
+       (2, 'Corner Store', '456 Elm Avenue'),
+       (3, 'Mega Mart', '789 Oak Road'),
+       (4, 'Discount Mart', '10 Pine Lane'),
+       (5, 'Neighborhood Market', '111 Maple Drive'),
+       (6, 'Convenience Store', '222 Cedar Street');
+
+
+INSERT INTO Items (ItemId, name, description)
+VALUES (101, 'Milk', 'Fresh cow milk'),
+       (102, 'Bread', 'Whole wheat bread'),
+       (103, 'Apples', 'Red apples'),
+       (104, 'Chicken', 'Boneless chicken breast'),
+       (105, 'Cereal', 'Whole grain cereal'),
+       (106, 'Eggs', 'Large eggs');
+
+
+INSERT INTO Sells (ShopId, ItemId, price)
+VALUES (1, 101, 2.99),
+       (3, 102, 1.99),
+       (6, 103, 0.99),
+       (5, 104, 5.99),
+       (2, 105, 3.49),
+       (4, 106, 2.49);
+
+
+INSERT INTO Customers (CustomerId, name, address)
+VALUES (14, 'John Smith', '123 Oak Street'),
+       (11, 'Mary Johnson', '456 Elm Avenue'),
+       (16, 'Michael Davis', '789 Pine Road'),
+       (15, 'Jennifer Wilson', '10 Maple Drive'),
+       (13, 'David Thompson', '111 Cedar Lane'),
+       (12, 'Jessica Martinez', '222 Walnut Street');
+
+
+INSERT INTO Sales (SaleId, CustomerId, ItemId, ShopId, date)
+VALUES (1002, 11, 101, 1, '2023-05-01'),
+       (1001, 13, 102, 2, '2023-05-02'),
+       (1005, 14, 103, 3, '2023-05-03'),
+       (1004, 12, 104, 4, '2023-05-04'),
+       (1003, 15, 105, 5, '2023-05-05'),
+       (1006, 16, 106, 6, '2023-05-06');
+
+//QUERIES
+
+c)
+SELECT name, address
+FROM Customers
+WHERE CustomerId NOT IN (SELECT DISTINCT CustomerId FROM Sales);
+
+d)
+select count(shops.ShopId) from shops,items,sells where shops.ShopId=sells.ShopId and sells.itemId=items.itemId and shops.name LIKE ("C%");
+
+SELECT COUNT(DISTINCT ShopId)
+FROM Sells
+WHERE ItemId = 105;
+
+e)
+select name , address from shops Natural join sells  where sells.itemid = 103 and price = (select min(price) from sells where sells.itemid = 103);
+
+f)
+select CustomerId , sum(price) from sales , sells where sales.itemid = sells.itemid GROUP BY(customerid) HAVING count(sales.itemid)>=1;
+
+g)
+select CustomerId , sum(price) from sales , sells where sales.itemid = sells.itemid GROUP BY(customerid);
+
+
+h)
+select customers.customerId , name from sales , sells , customers where sales.itemid = sells.itemid and customers.customerId = sales.customerId GROUP BY(customerid) ORDER BY sum(price) desc limit 1;
+select customers.customerId , name from customers natural join sales natural join sells where price = (select max(price) from sells);
+
+i)
+// procedure format same as above
+select CustomerId ,count(ItemId) from sales group by(CustomerId);
+
+j)
+//NOT 100 % sure
+CREATE TRIGGER delete_item_trigger
+BEFORE DELETE ON Items
+FOR EACH ROW
+BEGIN
+  DELETE FROM Sales WHERE ItemId = OLD.ItemId;
+  DELETE FROM sells WHERE ItemId = OLD.ItemId;  
+END;
+
+--- add below lines of code while performing the above trigger 
+---after foreign key constraint error---
+ALTER TABLE sells
+DROP FOREIGN KEY sells_ibfk_2;
+
+ALTER TABLE sells
+ADD CONSTRAINT sells_ibfk_2 FOREIGN KEY (ItemId) REFERENCES items (ItemId) ON DELETE CASCADE;
+
+
+		CREATE TRIGGER yzz
+    -> AFTER UPDATE ON Items
+    -> FOR EACH ROW
+    -> BEGIN
+    ->   UPDATE Shops Set name="YZ";
+    -> END;
+    ->
+    -> //
+
+UPDATE items set name="hoi" where itemId=101;
+    -> //
+
+-------------------------------------------------------------------------------------------
+/////////analyst
+
+--CREATION 
+CREATE TABLE DEPT(DEPTNO int , DNAME varchar(100) , LOC varchar(100) ,primary key(DEPTNO));
+CREATE TABLE EMP(EMPNO INT , ENAME varchar(100) , JOB varchar(50) , MGR INT , HIREDATE date , SAL INT , COMM INT , DEPTNO INT , FOREIGN KEY (DEPTNO) references DEPT(DEPTNO) , PRIMARY KEY (EMPNO))
+
+--INSERTION
+
+
+INSERT INTO DEPT (DEPTNO, DNAME, LOC)
+VALUES
+(10, 'ACCOUNTING', 'NEW YORK'),
+(20, 'RESEARCH', 'DALLAS'),
+(30, 'SALES', 'CHICAGO'),
+(40, 'OPERATIONS', 'BOSTON');
+
+
+INSERT INTO EMP (EMPNO, ENAME, JOB, MGR, HIREDATE, SAL, COMM, DEPTNO)
+VALUES
+(7369, 'SMITH', 'CLERK', 7902, '1980-12-17', 800, NULL, 20),
+(7499, 'ALLEN', 'SALESMAN', 7698, '1981-02-20', 1600, 300, 30),
+(7521, 'WARD', 'SALESMAN', 7698, '1981-02-22', 1250, 500, 30),
+(7566, 'JONES', 'MANAGER', 7839, '1981-04-02', 2975, NULL, 20),
+(7654, 'MARTIN', 'SALESMAN', 7698, '1981-09-28', 1250, 1400, 30),
+(7698, 'BLAKE', 'MANAGER', 7839, '1981-05-01', 2850, NULL, 30),
+(7782, 'CLARK', 'MANAGER', 7839, '1981-06-09', 2450, NULL, 10),
+(7788, 'SCOTT', 'ANALYST', 7566, '1982-12-09', 3000, NULL, 20),
+(7839, 'KING', 'PRESIDENT', NULL, '1981-11-17', 5000, NULL, 10),
+(7844, 'TURNER', 'SALESMAN', 7698, '1981-09-08', 1500, 0, 30),
+(7876, 'ADAMS', 'CLERK', 7788, '1983-01-12', 1100, NULL, 20),
+(7900, 'JAMES', 'CLERK', 7698, '1981-12-03', 950, NULL, 30),
+(7902, 'FORD', 'ANALYST', 7566, '1981-12-03', 3000, NULL, 20),
+(7934, 'MILLER', 'CLERK', 7782, '1982-01-23', 1300, NULL, 10);
+
+//QUERIES
+
+1)
+select * from emp where job = "ANALYST" and ename NOT LIKE("%s")
+
+2)
+select * from emp where sal > (select max(sal) from emp where job = "MANAGER");
+
+3)
+SELECT *
+FROM EMP
+WHERE JOB = 'MANAGER' AND DEPTNO IN (20, 30);
+
+4) //NOT CLEAR MENTION
+SELECT *
+FROM EMP
+WHERE JOB = 'MANAGER' AND EMPNO NOT IN (SELECT MGR FROM EMP);
+
+5)
+select * from emp ORDER BY (sal) desc LIMIT 1,2;
+select DISTINCT sal from emp ORDER BY (sal) desc LIMIT 1,1;
+
+
+6)
+SELECT DEPTNO, COUNT(*) AS NumEmployees
+FROM EMP
+GROUP BY DEPTNO
+HAVING COUNT(*) > 3;
+
+select DEPTNO  FROM EMP GROUP BY DEPTNO HAVING COUNT(empno) > 3;
+
+
+7)
+SELECT JOB, AVG(SAL)
+FROM EMP
+WHERE EMPNO NOT BETWEEN 7788 AND 7790
+GROUP BY JOB;
+
+mysql> SELECT JOB, AVG(SAL)
+    -> FROM EMP
+    -> WHERE EMPNO NOT IN (7788 , 7790)
+    -> GROUP BY JOB;
+
+
+8)
+SELECT DEPTNO, SUM(SAL)
+FROM EMP
+WHERE JOB IN ('MANAGER', 'ANALYST')
+GROUP BY DEPTNO
+HAVING AVG(SAL) >= 3000;
+
+9)
+select DISTINCT sal from emp ORDER BY (sal) desc LIMIT 2,1;
+
+10,11)
+SELECT *
+FROM EMP
+WHERE JOB IN ('MANAGER', 'CLERK') AND DEPTNO IN (10, 30);
+
+12)
+SELECT e.*
+FROM EMP e
+WHERE e.HIREDATE < (
+  SELECT m.HIREDATE
+  FROM EMP m
+  WHERE e.MGR = m.EMPNO
+);
+
+//or
+
+SELECT *
+FROM EMP
+WHERE HIREDATE < (
+  SELECT m.HIREDATE
+  FROM EMP m
+  WHERE EMP.MGR = m.EMPNO
+);
+
+13) select e1.ename,coalesce(e2.ename,"CEO") from emp e1 left join emp e2 on e1.mgr=e2.empno;//
+
+
+14)   CREATE TRIGGER delete_department_trigger
+BEFORE DELETE ON DEPT
+FOR EACH ROW
+BEGIN
+  DELETE FROM EMP WHERE DEPTNO = OLD.DEPTNO;
+END;
+
+15)
+CREATE PROCEDURE display_job_wise_max_salary()
+BEGIN
+  SELECT JOB, MAX(SAL)
+  FROM EMP
+  GROUP BY JOB
+---------------------------------------------------------------------------------------------------------------
+///worker
+//creation of tables
+
+mysql> use WorkerJobManagement;
+Database changed
+mysql> CREATE TABLE WORKER (
+->   worker_id INT PRIMARY KEY,
+->   name VARCHAR(255) NOT NULL,
+->   wage_per_hour DECIMAL(10, 2) CHECK (wage_per_hour >= 0),
+->   specialized_in VARCHAR(255),
+->   manager_id INT
+-> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql>
+mysql> CREATE TABLE JOB (
+->   job_id INT PRIMARY KEY,
+->   type_of_job VARCHAR(255),
+->   status VARCHAR(255)
+-> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> CREATE TABLE JOB_ASSIGNED (
+->   worker_id INT,
+->   job_id INT,
+->   starting_date DATE,
+->   number_of_days INT,
+->   FOREIGN KEY (worker_id) REFERENCES WORKER(worker_id),
+->   FOREIGN KEY (job_id) REFERENCES JOB(job_id)
+-> );
+Query OK, 0 rows affected (0.03 sec)
+
+//INSERTION 
+
+mysql> INSERT INTO WORKER (worker_id, name, wage_per_hour, specialized_in, manager_id)
+-> VALUES (1, 'John Doe', 10.50, 'Carpentry', 2),
+->        (2, 'Jane Smith', 15.25, 'Painting', 3),
+->        (3, 'Michael Johnson', 12.75, 'Polishing', 4),
+->        (4, 'Sarah Williams', 14.00, 'Polishing', 2),
+->        (5, 'David Brown', 9.75, 'Carpentry', 3);
+Query OK, 5 rows affected (0.00 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO JOB (job_id, type_of_job, status)
+-> VALUES (101, 'Construction', 'Incomplete'),
+->        (102, 'Painting', 'Incomplete'),
+->        (103, 'Polishing', 'Complete'),
+->        (104, 'Carpentry', 'Incomplete');
+Query OK, 4 rows affected (0.01 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+INSERT INTO JOB_ASSIGNED (worker_id, job_id, starting_date, number_of_days)
+-> VALUES (1, 101, '2023-05-28', 10),
+->        (2, 102, '2023-06-01', 7),
+->        (3, 103, '2023-05-15', 5),
+->        (4, 101, '2023-05-30', 12),
+->        (5, 104, '2023-06-05', 8);
+
+
+
+//QUERIES
+
+1)
+select name,starting_date+ INTERVAL number_of_days Day from worker natural join Job_assigned;
+
+// for adding days mention DAY for months MONTH and for year YEAR
+
+select name,starting_date+ INTERVAL number_of_days MONTH from worker natural join Job_assigned;
+
+2)
+
+select name,starting_date,((starting_date+ INTERVAL number_of_days DAY)-CURDATE()) as remain_day from worker natural join Job_assigned;
+
+o
+
+select name,starting_date,((starting_date+ INTERVAL number_of_days DAY)-CURDATE()) as remain_day from worker ,Job_assigned where worker.worker_id=Job_assigned.worker_id;
+
+3)
+
+SELECT CONCAT('The ', WEEKDAY(starting_date)+1, ' day of month of ', DATE_FORMAT(starting_date, '%M, %Y')) AS formatted_starting_date from JOB_ASSIGNED;
+
+Q4)
+mysql> update job_assigned join JOB ON JOB.job_id=job_assigned.job_id set status="Complete" where Year(starting_date)=2023;
+Query OK, 3 rows affected (0.00 sec)
+Rows matched: 4  Changed: 3  Warnings: 0
+
+mysql> select * from JOB_assigned;
++-----------+--------+---------------+----------------+
+| worker_id | job_id | starting_date | number_of_days |
++-----------+--------+---------------+----------------+
+|         1 |    101 | 2023-05-28    |             10 |
+|         2 |    102 | 2023-06-01    |              7 |
+|         3 |    103 | 2023-05-15    |              5 |
+|         4 |    101 | 2023-05-30    |             12 |
+|         5 |    104 | 2023-06-05    |              8 |
++-----------+--------+---------------+----------------+
+5 rows in set (0.00 sec)
+
+mysql> select * from JOB;
++--------+--------------+----------+
+| job_id | type_of_job  | status   |
++--------+--------------+----------+
+|    101 | Construction | Complete |
+|    102 | Painting     | Complete |
+|    103 | Polishing    | Complete |
+|    104 | Carpentry    | Complete |
++--------+--------------+----------+
+4 rows in set (0.00 sec)
+
+Q5)
+
+select sum(number_of_days) as no_of_days,Job.job_id from Job natural join job_assigned  where type_of_job="Painting" group by job_id;
+
+select sum(number_of_days) as no_of_days,Job.job_id from Job natural join job_assigned  where type_of_job="Construction" group by job_id;
+
+
+Q6)
+ select * from worker where wage_per_hour > (select avg(wage_per_hour) from worker);
+
+Q7)   select worker.* from worker natural join job_assigned group by worker_id having count(job_id)>1;
+
+Q8)
+
+
+ select name from worker natural join job_assigned natural join job where type_of_job="Polishing" and MONTH(starting_date)=5;
+
+Q9)
+
+select name from worker where specialized_in ="Polishing" or wage_per_hour > (select min(wage_per_hour) from worker);
+
+Q 10)
+
+select Job.*,count(worker_id) from Job natural join Job_assigned group by job_id having count(worker_id)>1;
+
+Q 11) 
+       select * from job where status="Complete";
+
+Q 12)
+     
+        select * from job natural join job_assigned where starting_date between CURDATE() and CURDATE() + INTERVAL 2 WEEK;
+         //or
+         select * from job natural join job_assigned where starting_date between CURDATE() and CURDATE() + INTERVAL 14 DAY; 
+
+Q 13) 
+select w1.* from worker w1, worker w2 where w2.worker_id = w1.manager_id and w1.wages_per_hour >= 2*w2.wages_per_hour;
+
+Q 14)   
+
+          select name,job.job_id from worker,job,job_assigned where worker.worker_id=job_assigned.worker_id and job_assigned.job_id=job.job_id and type_of_job="Polishing";
+
+Q 15)
+      select name from worker where wage_per_hour>10;
+
+Q 16)
+
+      select job.* from job natural join job_assigned where starting_date > CURDATE();
+---------------------------------------------------------------------------------------------------------
+///////university
+-- Table Creation
+
+CREATE TABLE students (
+    name VARCHAR(50),
+    SSN INT PRIMARY KEY,
+    address VARCHAR(100),
+    ph_no VARCHAR(20),
+    DOB DATE,
+    Dept_code INT,
+    Degree VARCHAR(10)
+);
+
+CREATE TABLE departments (
+    depart_name VARCHAR(50),
+    dept_code INT,
+    office_number VARCHAR(20),
+    office_phone VARCHAR(20),
+    college VARCHAR(50),
+    PRIMARY KEY (depart_name, dept_code),
+    INDEX (dept_code) -- Add index on dept_code column
+);
+
+CREATE TABLE courses (
+    course_number INT,
+    course_name VARCHAR(50),
+    description VARCHAR(100),
+    credit_hours INT,
+    offering_dept INT,
+    FOREIGN KEY (offering_dept) REFERENCES departments (dept_code),
+    PRIMARY KEY (course_number, offering_dept)
+);
+
+CREATE TABLE sections (
+    section_number INT PRIMARY KEY,
+    instructor VARCHAR(50),
+    semester VARCHAR(20),
+    year INT,
+    course_number INT,
+   FOREIGN KEY (course_number) REFERENCES courses (course_number)
+);
+
+CREATE TABLE grade_reports (
+    student_SSN INT,
+    section_number INT,
+    grade VARCHAR(1),
+    PRIMARY KEY (student_SSN, section_number),
+    FOREIGN KEY (student_SSN) REFERENCES students (SSN),
+    FOREIGN KEY (section_number) REFERENCES sections (section_number)
+);
+
+CREATE TABLE enrollment (
+    SSN INT,
+    course_no INT,
+    Dept_code INT,
+    grade VARCHAR(1),
+    FOREIGN KEY(SSN) REFERENCES students(SSN),
+    FOREIGN KEY(course_no) REFERENCES courses(course_number),
+    FOREIGN KEY(Dept_code) REFERENCES departments(dept_code),
+    FOREIGN KEY(grade) REFERENCES grade_reports(grade)
+ );
+CREATE INDEX idx_grade_reports_ ON grade_reports (grade);
+		
+
+--Inserting Values
+
+INSERT INTO students (name, SSN, address, ph_no, DOB, Dept_code, Degree)
+VALUES
+    ('John Doe', 123456789, '123 Main St', '123-456-7890', '2000-01-01', 501, 'B.A.'),
+    ('Jane Smith', 987654321, '456 Elm St', '987-654-3210', '2001-02-03', 502, 'B.S.'),
+    ('Mike Johnson', 456789123, '789 Oak St', '456-789-1230', '1999-04-05', 503, 'B.A.'),
+    ('Sarah Williams', 789123456, '321 Maple St', '789-123-4560', '2002-06-07', 502, 'B.S.'),
+    ('Emily Davis', 654321987, '654 Pine St', '654-321-9870', '2000-08-09', 501, 'B.A.');
+
+INSERT INTO departments (depart_name, dept_code, office_number, office_phone, college)
+VALUES
+    ('Computer Science', 501, 'A101', '123-456-7890', 'Engineering'),
+    ('Mathematics', 502, 'B202', '987-654-3210', 'Sciences'),
+    ('Business Administration', 503, 'C303', '456-789-1230', 'Business');
+
+INSERT INTO courses (course_number, course_name, description, credit_hours, offering_dept)
+VALUES
+    (101, 'Introduction to Programming', 'Introduction to programming concepts', 3, 501),
+    (102, 'Database Management Systems', 'Introduction to database systems', 4, 501),
+    (201, 'Calculus I', 'Introduction to differential and integral calculus', 4, 502),
+    (202, 'Linear Algebra', 'Introduction to linear algebra concepts', 3, 502),
+    (301, 'Principles of Marketing', 'Introduction to marketing principles', 3, 503);
+
+INSERT INTO sections (section_number, instructor, semester, year, course_number)
+VALUES
+    (1, 'Dr. Smith', 'Fall', 2022, 101),
+    (2, 'Prof. Johnson', 'Spring', 2023, 102),
+		(3, 'Dr. Davis', 'Fall', 2022, 201),
+    (4, 'Prof. Wilson', 'Spring', 2023, 202),
+    (5, 'Dr. Anderson', 'Fall', 2022, 301);
+
+INSERT INTO grade_reports (student_SSN, section_number, grade)
+VALUES
+    (123456789, 1, 'A'),
+    (987654321, 2, 'B'),
+    (456789123, 3, 'A'),
+    (789123456, 4, 'B'),
+    (654321987, 5, 'C');
+
+INSERT INTO enrollment (SSN, course_no, Dept_code, grade) VALUES
+     (123456789, 101, 501, 'A'),
+     (123456789, 102, 501, 'B'),
+     (987654321, 201, 502, 'B'),
+     (987654321, 202, 502, 'B'),
+     (456789123, 301, 503, 'C'),
+     (789123456, 102, 501, 'A'),
+     (789123456, 201, 502, 'B'),
+     (654321987, 202, 502, 'C');
+
+--------------------------------------------------------------------------------------------------
+///////////////sailors
+-- Create table SAILORS
+CREATE TABLE SAILORS (
+  SID INT,
+  SNAME VARCHAR(100),
+  RATING INT,
+  AGE INT,
+  PRIMARY KEY (SID),
+  CHECK (RATING BETWEEN 1 AND 10)
+);
+
+-- Create table BOATS
+CREATE TABLE BOATS (
+  BID INT,
+  BNAME VARCHAR(100),
+  COLOR VARCHAR(100),
+  PRIMARY KEY (BID)
+);
+
+-- Create table RESERVES
+CREATE TABLE RESERVES (
+  SID INT,
+  BID INT,
+  DAY DATE,
+  FOREIGN KEY (SID) REFERENCES SAILORS (SID),
+  FOREIGN KEY (BID) REFERENCES BOATS (BID)
+);
+
+-- Insert values into SAILORS
+INSERT INTO SAILORS (SID, SNAME, RATING, AGE)
+VALUES
+  (101, 'John', 8, 25),
+  (102, 'Mary', 6, 22),
+  (103, 'David', 9, 28),
+  (104, 'Sarah', 7, 17),
+  (105, 'Michael', 5, 15);
+
+-- Insert values into BOATS
+INSERT INTO BOATS (BID, BNAME, COLOR)
+VALUES
+  (201, 'Boat1', 'Blue'),
+  (202, 'Boat2', 'Red'),
+  (203, 'Boat3', 'Green'),
+  (204, 'Boat4', 'Yellow'),
+  (205, 'Boat5', 'White');
+
+-- Insert values into RESERVES
+INSERT INTO RESERVES (SID, BID, DAY)
+VALUES
+  (101, 201, '2023-05-01'),
+  (101, 205, '2023-05-07'),
+  (102, 203, '2023-05-05'),
+  (102, 204, '2023-06-12'),
+  (102, 206, '2023-06-04'),
+  (103, 204, '2023-05-03'),
+  (104, 202, '2023-05-04'),
+	(104, 203, '2023-05-14'),
+  (105, 205, '2023-05-05');
+
+
+
+INSERT INTO RESERVES (SID, BID, DAY)
+VALUES
+  (101, 201, '2023-05-01'),
+  (102, 203, '2023-05-02'),
+  (103, 204, '2023-05-03'),
+  (104, 202, '2023-05-04'),
+  (104, 203, '2023-05-04'),
+  (104, 204, '2023-05-04'),
+  (105, 204, '2023-05-04'),
+  (105, 205, '2023-05-05');
+
+//QUERIES
+
+1)
+select * from sailors natural join reserves natural join boats where boats.color = "Red" or boats.color = "Blue";
+or
+select distinct sname from sailors natural join reserves natural join boats where color="Red" or color="Green";
+
+2)
+select sname from sailors where sid in (select sid from reserves natural join boats where color in("Red","Green") group by sid having count(distinct color)=2);
+
+//or
+
+SELECT SNAME
+FROM SAILORS
+WHERE SID IN (
+  SELECT SID
+  FROM RESERVES
+  JOIN BOATS ON RESERVES.BID = BOATS.BID
+  WHERE COLOR IN ('Red', 'Green')
+  GROUP BY SID
+  HAVING COUNT(DISTINCT COLOR) = 2
+);
+
+
+3)
+ select sid from reserves natural join boats where color="Yellow" and sid  not in (select sid from reserves natural join boats where color="Green");   
+
+4)
+select sname from sailors where rating > (select rating from sailors where sname="Mary");
+
+5) select * from sailors order by rating desc limit 1;
+
+//using all
+select * from sailors where rating >= all(select rating from sailors);
+
+6) select sname,age from sailors where age >=(select max(age) from sailors);
+
+7)  select sname from sailors where age > (select max(age) from sailors where rating = 6);
+
+8) select * from sailors order by rating asc, age asc;
+
+9) select rating,min(age) from sailors where age >=18 group by rating;
+
+10) 
+      create procedure proc (IN id int )
+        begin
+          delete from sailors where id=sid;
+        end//
+
+--------------------------------------------------------------------------------------------------------
+//////////bank database
+
+-- CREATION OF TABLES
+
+CREATE TABLE Customer (
+    customer_id INT PRIMARY KEY,
+    customer_name VARCHAR(50),
+    address VARCHAR(100),
+    age INT,
+    contact_number VARCHAR(20),
+    email_id VARCHAR(50)
+);
+
+
+CREATE TABLE Account (
+    account_number VARCHAR(10) PRIMARY KEY,
+    customer_id INT,
+    account_type VARCHAR(20),
+    date_of_creation DATE,
+    balance DECIMAL(10, 2),
+    FOREIGN KEY (customer_id) REFERENCES Customer(customer_id)
+);
+
+
+CREATE TABLE Transaction (
+    transaction_id INT PRIMARY KEY,
+    account_number VARCHAR(10),
+    amount DECIMAL(10, 2),
+    transaction_date DATE,
+		transaction_type VARCHAR(20),
+    FOREIGN KEY (account_number) REFERENCES Account(account_number)
+);
+
+
+CREATE TABLE Loan (
+    loan_id INT PRIMARY KEY,
+    account_number VARCHAR(10),
+    loan_amount DECIMAL(10, 2),
+    loan_date DATE,
+    FOREIGN KEY (account_number) REFERENCES Account(account_number)
+);
+
+
+--INSERT VALUES
+
+
+INSERT INTO Customer (customer_id, customer_name, address, age, contact_number, email_id)
+VALUES
+    (1, 'John Doe', '123 Main St, City', 35, '555-1234', 'johndoe@email.com'),
+    (2, 'Jane Smith', '456 Elm St, Town', 28, '555-5678', 'janesmith@email.com'),
+    (3, 'Mike Johnson', '789 Oak St, Village', 42, '555-9012', 'mikejohnson@email.com'),
+    (4, 'Sarah Wilson', '321 Pine St, County', 31, '555-3456', 'sarahwilson@email.com'),
+    (5, 'David Brown', '654 Cedar St, District', 39, '555-7890', 'davidbrown@email.com'),
+    (6, 'Lisa Davis', '987 Walnut St, Borough', 26, '555-2345', 'lisadavis@email.com'),
+    (7, 'Robert Taylor', '258 Maple St, Township', 33, '555-6789', 'roberttaylor@email.com');
+
+
+INSERT INTO Account (account_number, customer_id, account_type, date_of_creation, balance)
+VALUES
+    ('A001', 1, 'savings', '2022-01-01', 5000.00),
+    ('A002', 2, 'fixed account', '2021-07-15', 10000.00),
+    ('A003', 3, 'monthly account', '2023-03-10', 2000.00),
+    ('A004', 4, 'savings', '2022-11-30', 8000.00),
+    ('A005', 5, 'savings', '2022-06-20', 15000.00),
+    ('A006', 6, 'monthly account', '2023-02-05', 3000.00),
+    ('A007', 7, 'fixed account', '2021-12-12', 12000.00);
+
+
+INSERT INTO Transaction (transaction_id, account_number, amount, transaction_date, transaction_type)
+VALUES
+    (101, 'A001', 1000.00, '2023-05-28','WITHDRAWL'),
+    (102, 'A002', 5000.00, '2023-05-28','DEPOSIT'),
+    (103, 'A003', 200.00, '2023-05-27','WITHDRAWL'),
+    (104, 'A004', 3000.00, '2023-05-26','DEPOSIT'),
+    (105, 'A005', 2000.00, '2023-05-25','WITHDRAWL'),
+    (106, 'A006', 500.00, '2023-05-25','DEPOSIT'),
+		(107, 'A006', 500.00, '2023-05-25','WITHDRAWL'),
+		(108, 'A006', 1500.00, '2023-05-22','DEPOSIT'),
+		(109, 'A007', 5090.00, '2023-01-21','WITHDRAWL'),
+    (110, 'A007', 10000.00, '2023-02-14','DEPOSIT');
+
+
+INSERT INTO Loan (loan_id, account_number, loan_amount, loan_date)
+VALUES
+    (1, 'A002', 7500.00, '2023-04-15'),
+    (2, 'A004', 20000.00, '2023-03-20'),
+    (3, 'A007', 50000.00, '2023-02-10'),
+    (4, 'A001', 10000.00, '2023-01-05'),
+    (5, 'A005', 30000.00, '2023-06-30'),
+    (6, 'A003', 15000.00, '2023-08-18'),
+		(7, 'A004', 1500.00, '2023-09-18'),
+		(8, 'A006', 1000.00, '2022-01-18'),
+    (9, 'A006', 25000.00, '2023-07-12');
+
+// QUERIES
+
+ a)
+select customer.* from customer NATURAL JOIN account WHERE account_type = "savings";
+
+select customer.*  from customer , account where customer.customer_id = account.customer_id and account_type='savings';
+
+
+b)
+select customer_name , address from customer natural join account natural join loan where loan_amount > 10000;
+
+select customer_name,address,loan_amount from Loan,Account,Customer where Customer.customer_id=Account.customer_id and Loan.Account_number=Account.account_number and  loan_amount>10000;
+
+
+c)
+update Customer,Account  set customer_name="ABC" where Customer.customer_id=Account.customer_id and account_number="A001";
+
+
+d)
+SELECT account_number
+FROM Transaction
+WHERE transaction_type = 'DEPOSIT'
+GROUP BY account_number
+HAVING SUM(amount) > 3000;
+
+
+e)
+select customer.* from customer natural join account where account_type='fixed account';
+
+select count(customer_id) from account where account_type = "fixed account";
+
+
+f)
+select customer.* from customer natural join account WHERE date_of_creation > '2022-01-01'AND date_of_creation < '2023-02-05';
+
+select customer.* from customer natural join account WHERE date_of_creation BETWEEN '2022-01-01'AND '2023-02-05';
+
+
+g)
+select * from transaction where transaction_date = '2023-05-25';
+
+select customer.* from customer natural join account natural join transaction where  transaction_date = '2023-05-25';
+
+
+h)
+SELECT 
+    SUM(CASE WHEN transaction_type='DEPOSIT'  THEN amount ELSE 0 END) AS total_deposit,
+    SUM(CASE WHEN transaction_type='WITHDRAWL'  THEN amount ELSE 0 END) AS total_withdrawl
+FROM Transaction
+WHERE DATE(transaction_date) = '2023-05-25';
+
+
+i)select customer.* from customer natural join account natural join loan;
+
+
+j)
+delimiter // create procedure p1()
+     begin
+      select *  from Customer natural join Loan natural join Account where account_type='savings';
+    end
+     //
+
+k)
+
+CREATE TRIGGER trg_delete_customer
+BEFORE DELETE ON Customer
+FOR EACH ROW
+BEGIN
+    -- Delete associated transactions
+    DELETE FROM Transaction
+    WHERE account_number IN (
+        SELECT account_number
+        FROM Account
+        WHERE customer_id = OLD.customer_id
+    );
+    
+    -- Delete associated loans
+    DELETE FROM Loan
+    WHERE account_number IN (
+        SELECT account_number
+        FROM Account
+        WHERE customer_id = OLD.customer_id
+    );
+
+    -- Delete customer's accounts
+    DELETE FROM Account
+    WHERE customer_id = OLD.customer_id;
+END;
+
+
+
+-- to execute the above trigger -->
+delete from customer where customer_id=1;
+    -> //
+
+
+
+
